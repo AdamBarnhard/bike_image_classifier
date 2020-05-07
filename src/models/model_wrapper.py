@@ -1,15 +1,13 @@
-class DummyModel:
-    # DELETE ME - Remove this class when you load a real model. This only
-    # exists so the ModelWrapper works when creating an initial project.
-    """
-    A placeholder for a real ML Model. Returns the number of features in each row.
+from tensorflow.keras.applications.mobilenet_v2 import preprocess_input
+from tensorflow.keras.preprocessing.image import img_to_array
+from tensorflow.keras.preprocessing.image import load_img
+from tensorflow.keras.models import load_model
+import numpy as np
+import argparse
+import cv2
+import os
 
-    Example:
 
-        DummyModel().predict([[1,2],[3,4]]) => [2,2]
-    """
-    def predict(self,X):
-        return list(map(lambda instance: len(instance), X))
 
 class ModelWrapper:
     """
@@ -34,11 +32,18 @@ class ModelWrapper:
                 self.tokenizer = pickle.load(handle)
         """
         # REPLACE ME - add your loading logic
-        self.model = DummyModel()
+        self.model = load_model('../models/bike_classification_model.model')
 
     def predict(self,data):
         """
         Returns model predictions.
         """
         # Add any required pre/post-processing steps here.
-        return self.model.predict(data)
+        image = load_img(data, target_size=(224, 224))
+        image = img_to_array(image)
+        image = preprocess_input(image)
+        image = np.array(image, dtype="float32")
+        image = np.expand_dims(image, axis=0)
+
+        [response] = self.model.predict(image)
+        return 'Mountain: ' + str(response[0]) + ', Road: ' + str(response[1])
