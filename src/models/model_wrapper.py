@@ -44,6 +44,7 @@ class ModelWrapper:
         image = preprocess_input(image)
         image = np.array(image, dtype="float32")
         image = np.expand_dims(image, axis=0)
+        
 
         [response] = self.model.predict(image)
         return 'Mountain: ' + str(response[0]) + ', Road: ' + str(response[1])
